@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useBlockchain } from '../contexts/BlockchainContext';
 import { motion, AnimatePresence } from 'framer-motion';
+// Import the GoogleTranslate component
 
 export default function Navbar() {
   const [userRole, setUserRole] = useState(null);
@@ -172,6 +173,7 @@ export default function Navbar() {
                       />
                     )}
                   </Link>
+
                 </motion.div>
 
                 <div className="h-5 w-px bg-neutral-600/50 mx-2"></div>
@@ -211,7 +213,7 @@ export default function Navbar() {
                         </div>
                         <button
                           onClick={handleLogout}
-                          className="w-full text-left px-4 py-2 text-sm text-neutral-200 hover:bg-neutral-700/50 hover:text-harvest-red transition-colors"
+                          className="w-full text-left px-4 py-2 text-sm text-neutral-200 hover:bg-harvest-red/10 hover:text-harvest-red transition-colors"
                         >
                           Sign out
                         </button>
@@ -227,15 +229,16 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.1 }}
               >
+
                 <Link
                   to="/login"
-                  className={`text-neutral-100 hover:text-leaf-light transition-colors px-4 py-2 rounded-lg ${isActive('/login') ? 'bg-neutral-700/50' : ''}`}
+                  className="btn bg-soil-dark text-white"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-white hover:bg-neutral-100 text-leaf-primary px-4 py-2 rounded-lg transition-colors shadow-glow-sm font-medium"
+                  className="btn bg-soil-dark text-white"
                 >
                   Register
                 </Link>
@@ -309,6 +312,11 @@ export default function Navbar() {
                         </div>
                       </Link>
 
+                      {/* Google Translate in mobile menu */}
+                      <div className="py-2 px-3">
+                        <GoogleTranslate />
+                      </div>
+
                       <div className="h-px bg-neutral-700 my-2"></div>
 
                       <button
@@ -316,13 +324,18 @@ export default function Navbar() {
                           handleLogout();
                           toggleMenu();
                         }}
-                        className="btn btn-outline-leaf w-full hover:scale-[0.99] transform transition-transform"
+                        className="btn bg-soil-dark text-white w-full"
                       >
                         Sign out
                       </button>
                     </>
                   ) : (
                     <>
+                      {/* Google Translate in mobile menu for non-logged in users */}
+                      <div className="py-2 px-3">
+                        <GoogleTranslate />
+                      </div>
+
                       <Link
                         to="/login"
                         className={`text-neutral-100 py-2 px-3 rounded-lg hover:bg-neutral-700/50 transition-colors ${isActive('/login') ? 'font-medium text-leaf-primary bg-neutral-700/25' : ''}`}
@@ -347,4 +360,4 @@ export default function Navbar() {
       </div>
     </nav>
   );
-} 
+}
