@@ -19,7 +19,6 @@ import SaleForm from './components/retailer/SaleForm';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { BlockchainProvider } from './contexts/BlockchainContext';
 import BlockchainDashboard from './components/BlockchainDashboard';
-import GoogleTranslate from './GoogleTranslate';
 import './styles/design-system.css';
 
 // Role-based route component
@@ -76,7 +75,6 @@ function App() {
     <Router>
       <AuthProvider>
         <BlockchainProvider>
-          <GoogleTranslate />
           <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-sky-light">
             <div className="crypto-grid absolute inset-0 opacity-5 pointer-events-none"></div>
             <Navbar />

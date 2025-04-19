@@ -23,5 +23,8 @@ capacitor.config.json
 config/
 services/
 
+# Ignore service account key in server_TTS
+server_TTS/service-account-key.json
+
 # General README
 README.md

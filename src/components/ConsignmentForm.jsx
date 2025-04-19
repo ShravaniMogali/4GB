@@ -6,7 +6,7 @@ import { db } from '../config/firebase';
 import { collection, addDoc, getDocs, query, where, updateDoc, doc } from 'firebase/firestore';
 import QRCode from 'qrcode.react';
 import toast from 'react-hot-toast';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker, DirectionsService, DirectionsRenderer } from '@react-google-maps/api';
 
 function LocationMarker({ position, setPosition }) {
   useEffect(() => {
@@ -49,7 +49,9 @@ export default function ConsignmentForm() {
     transporterId: '',
     expectedDeliveryDate: '',
     transportMode: 'road',
-    specialInstructions: ''
+    specialInstructions: '',
+    fromCity: '',
+    toCity: ''
   });
   const [position, setPosition] = useState(null);
   const [qrCode, setQrCode] = useState(null);
@@ -61,6 +63,14 @@ export default function ConsignmentForm() {
   const { currentUser } = useAuth();
   const { createConsignmentOnBlockchain } = useBlockchain();
   const navigate = useNavigate();
+  const [spokenText, setSpokenText] = useState('');
+  const [translatedText, setTranslatedText] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [recognition, setRecognition] = useState(null);
+  const [destination, setDestination] = useState('');
+  const [directions, setDirections] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [destinationLocation, setDestinationLocation] = useState(null);
 
   // Fetch available distributors and transporters
   useEffect(() => {
@@ -77,7 +87,7 @@ export default function ConsignmentForm() {
           ...doc.data()
         }));
         setDistributors(distributorList);
-        
+
         // Fetch transporters
         const transporterQuery = query(
           collection(db, 'users'),
@@ -97,6 +107,142 @@ export default function ConsignmentForm() {
 
     fetchParticipants();
   }, []);
+
+  // Initialize map and get current location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setCurrentLocation(location);
+          setPosition(location);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          toast.error('Failed to get your location. Please try again.');
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+      );
+    }
+  }, []);
+
+  // Handle destination changes
+  const handleDestinationChange = async (city) => {
+    setDestination(city);
+    try {
+      const geocoder = new window.google.maps.Geocoder();
+      const result = await new Promise((resolve, reject) => {
+        geocoder.geocode({ address: city }, (results, status) => {
+          if (status === 'OK') {
+            resolve(results[0].geometry.location);
+          } else {
+            reject(new Error('Geocoding failed'));
+          }
+        });
+      });
+
+      setDestinationLocation({
+        lat: result.lat(),
+        lng: result.lng()
+      });
+    } catch (error) {
+      console.error('Error geocoding destination:', error);
+      toast.error('Could not find the destination city');
+    }
+  };
+
+  // Update voice input handling
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window) {
+      const recognition = new window.webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'hi-IN';
+
+      recognition.onresult = async (event) => {
+        const transcript = event.results[0][0].transcript;
+        setSpokenText(transcript);
+
+        try {
+          const translated = await translateText(transcript);
+          setTranslatedText(translated);
+
+          const response = await fetch('http://localhost:4005/dialogflow', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: translated,
+              sessionId: Math.random().toString(36).substring(7)
+            })
+          });
+
+          const data = await response.json();
+          const params = data.queryResult?.parameters || {};
+
+          // Update form with Dialogflow parameters
+          setFormData(prev => ({
+            ...prev,
+            vegetableName: params['vegetable'] || prev.vegetableName,
+            quantity: params['unit-weight']?.amount || prev.quantity,
+            unit: params['unit-weight']?.unit || prev.unit,
+            fromCity: params['geo-city'] || prev.fromCity,
+            toCity: params['geo-city1'] || prev.toCity
+          }));
+
+          // If destination city is provided, update the map
+          if (params['geo-city1']) {
+            handleDestinationChange(params['geo-city1']);
+          }
+
+        } catch (error) {
+          console.error('Translation or Dialogflow error:', error);
+          toast.error('Error processing voice input');
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      setRecognition(recognition);
+    }
+  }, []);
+
+  const startListening = () => {
+    if (recognition) {
+      recognition.start();
+      setIsListening(true);
+    } else {
+      toast.error('Speech recognition not supported in your browser');
+    }
+  };
+
+  const stopListening = () => {
+    if (recognition) {
+      recognition.stop();
+      setIsListening(false);
+    }
+  };
+
+  const translateText = async (text) => {
+    try {
+      const response = await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=hi&tl=en&dt=t&q=${encodeURIComponent(text)}`
+      );
+      const data = await response.json();
+      return data[0][0][0];
+    } catch (error) {
+      console.error('Translation error:', error);
+      return text;
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -133,7 +279,7 @@ export default function ConsignmentForm() {
       toast.error('Please select a distributor');
       return;
     }
-    
+
     if (!formData.transporterId) {
       toast.error('Please select a transporter');
       return;
@@ -142,11 +288,11 @@ export default function ConsignmentForm() {
     try {
       setLoading(true);
       const timestamp = new Date().toISOString();
-      
+
       // Find the selected distributor and transporter to get their names
       const selectedDistributor = distributors.find(d => d.id === formData.distributorId);
       const selectedTransporter = transporters.find(t => t.id === formData.transporterId);
-      
+
       const consignmentData = {
         ...formData,
         farmerId: currentUser.uid,
@@ -192,11 +338,11 @@ export default function ConsignmentForm() {
 
       // Create consignment in Firebase
       const docRef = await addDoc(collection(db, 'consignments'), consignmentData);
-      
+
       // Generate QR code and show modal
       setQrCode(docRef.id);
       setShowQRModal(true);
-      
+
       // Prepare data for blockchain
       const blockchainConsignmentData = {
         id: docRef.id,
@@ -215,18 +361,18 @@ export default function ConsignmentForm() {
         timestamp: timestamp,
         updatedBy: currentUser.uid
       };
-      
+
       // Add to blockchain
       try {
         setBlockchainStatus('processing');
         const result = await createConsignmentOnBlockchain(blockchainConsignmentData);
-        
+
         // Update Firebase with blockchain transaction ID
         await updateDoc(doc(db, 'consignments', docRef.id), {
           'blockchainData.transactionId': result.transactionId,
           'blockchainData.timestamp': result.timestamp
         });
-        
+
         setBlockchainStatus('completed');
         toast.success('Consignment added to blockchain successfully!');
       } catch (error) {
@@ -234,7 +380,7 @@ export default function ConsignmentForm() {
         setBlockchainStatus('failed');
         toast.error('Failed to add to blockchain, but consignment was saved locally');
       }
-      
+
       toast.success('Consignment created successfully!');
     } catch (error) {
       console.error('Error creating consignment:', error);
@@ -255,7 +401,45 @@ export default function ConsignmentForm() {
     <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
       <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
         <h2 className="text-3xl font-bold mb-8 text-gray-800 border-b pb-4">Create New Consignment</h2>
-        
+
+        {/* Voice Input Section */}
+        <div className="mb-8 bg-gray-50 p-6 rounded-xl">
+          <h3 className="text-xl font-semibold mb-4 text-gray-800">Voice Input</h3>
+          <div className="flex items-center space-x-4 mb-4">
+            <button
+              onClick={startListening}
+              disabled={isListening}
+              className={`px-4 py-2 rounded-lg ${isListening
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-green-500 hover:bg-green-600'
+                } text-white`}
+            >
+              {isListening ? 'Listening...' : '🎤 Start Voice Input'}
+            </button>
+            <button
+              onClick={stopListening}
+              disabled={!isListening}
+              className={`px-4 py-2 rounded-lg ${!isListening
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-red-500 hover:bg-red-600'
+                } text-white`}
+            >
+              Stop
+            </button>
+          </div>
+
+          {spokenText && (
+            <div className="space-y-2">
+              <p className="text-gray-700">
+                <span className="font-semibold">Spoken (Hindi):</span> {spokenText}
+              </p>
+              <p className="text-gray-700">
+                <span className="font-semibold">Translated (English):</span> {translatedText}
+              </p>
+            </div>
+          )}
+        </div>
+
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
@@ -367,15 +551,14 @@ export default function ConsignmentForm() {
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-semibold text-gray-800">Blockchain Record</h3>
                 <div className="text-sm">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full ${
-                    blockchainStatus === 'completed' 
-                      ? 'bg-green-100 text-green-800' 
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full ${blockchainStatus === 'completed'
+                      ? 'bg-green-100 text-green-800'
                       : blockchainStatus === 'failed'
                         ? 'bg-red-100 text-red-800'
                         : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {blockchainStatus === 'completed' 
-                      ? 'Blockchain Ready' 
+                    }`}>
+                    {blockchainStatus === 'completed'
+                      ? 'Blockchain Ready'
                       : blockchainStatus === 'failed'
                         ? 'Blockchain Failed'
                         : 'Will be added to blockchain'}
@@ -467,70 +650,72 @@ export default function ConsignmentForm() {
             </div>
 
             <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">Location</h3>
-              <p className="text-sm text-gray-600 mb-4">Click on the map to set pickup location or use current location</p>
+              <h3 className="text-xl font-semibold mb-4 text-gray-800">Location & Route</h3>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Destination City
+                </label>
+                <input
+                  type="text"
+                  value={destination}
+                  onChange={(e) => handleDestinationChange(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition duration-200"
+                  placeholder="Enter destination city"
+                />
+              </div>
+
               <div className="h-[400px] rounded-xl overflow-hidden border border-gray-200">
                 <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
                   <GoogleMap
                     mapContainerStyle={{ height: '100%', width: '100%' }}
-                    center={position || { lat: 20.5937, lng: 78.9629 }}
-                    zoom={position ? 15 : 5}
-                    onClick={handleMapClick}
+                    center={currentLocation || { lat: 20.5937, lng: 78.9629 }}
+                    zoom={currentLocation ? 10 : 5}
                     options={{
                       mapTypeControl: true,
                       streetViewControl: true,
                       fullscreenControl: true,
                       zoomControl: true,
-                      styles: [
-                        {
-                          featureType: "poi",
-                          elementType: "labels",
-                          stylers: [{ visibility: "on" }]
-                        }
-                      ]
                     }}
                   >
-                    {position && (
+                    {currentLocation && (
                       <Marker
-                        position={position}
-                        draggable={true}
-                        onDragEnd={(e) => {
-                          setPosition({
-                            lat: e.latLng.lat(),
-                            lng: e.latLng.lng()
-                          });
+                        position={currentLocation}
+                        label="You"
+                      />
+                    )}
+
+                    {destinationLocation && (
+                      <Marker
+                        position={destinationLocation}
+                        label="Destination"
+                      />
+                    )}
+
+                    {currentLocation && destinationLocation && (
+                      <DirectionsService
+                        options={{
+                          destination: destinationLocation,
+                          origin: currentLocation,
+                          travelMode: 'DRIVING'
+                        }}
+                        callback={(result, status) => {
+                          if (status === 'OK') {
+                            setDirections(result);
+                          }
+                        }}
+                      />
+                    )}
+
+                    {directions && (
+                      <DirectionsRenderer
+                        options={{
+                          directions: directions
                         }}
                       />
                     )}
                   </GoogleMap>
                 </LoadScript>
-              </div>
-              <div className="mt-4 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (navigator.geolocation) {
-                      navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                          setPosition({
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                          });
-                        },
-                        (error) => {
-                          console.error('Error:', error);
-                          toast.error('Could not get your location');
-                        }
-                      );
-                    }
-                  }}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
-                  Use Current Location
-                </button>
               </div>
             </div>
 
@@ -569,15 +754,14 @@ export default function ConsignmentForm() {
               </p>
               <div className="text-sm mb-6">
                 <div className="flex items-center justify-center space-x-2">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full ${
-                    blockchainStatus === 'completed' 
-                      ? 'bg-green-100 text-green-800' 
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full ${blockchainStatus === 'completed'
+                      ? 'bg-green-100 text-green-800'
                       : blockchainStatus === 'failed'
                         ? 'bg-red-100 text-red-800'
                         : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {blockchainStatus === 'completed' 
-                      ? 'Added to blockchain' 
+                    }`}>
+                    {blockchainStatus === 'completed'
+                      ? 'Added to blockchain'
                       : blockchainStatus === 'failed'
                         ? 'Blockchain record failed'
                         : 'Adding to blockchain...'}
@@ -606,4 +790,4 @@ export default function ConsignmentForm() {
       )}
     </div>
   );
-} 
+}
