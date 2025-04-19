@@ -19,6 +19,7 @@ import SaleForm from './components/retailer/SaleForm';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { BlockchainProvider } from './contexts/BlockchainContext';
 import BlockchainDashboard from './components/BlockchainDashboard';
+import GoogleTranslate from './GoogleTranslate';
 import './styles/design-system.css';
 
 // Role-based route component
@@ -44,9 +45,9 @@ const RoleRoute = ({ children, allowedRoles }) => {
         <div className="relative">
           <div className="w-16 h-16 border-2 border-leaf-primary rounded-full animate-spin border-t-transparent"></div>
           <div className="crypto-dot absolute top-0 animate-pulse"></div>
-          <div className="crypto-dot absolute right-0 animate-pulse" style={{animationDelay: '0.5s'}}></div>
-          <div className="crypto-dot absolute bottom-0 animate-pulse" style={{animationDelay: '1s'}}></div>
-          <div className="crypto-dot absolute left-0 animate-pulse" style={{animationDelay: '1.5s'}}></div>
+          <div className="crypto-dot absolute right-0 animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+          <div className="crypto-dot absolute bottom-0 animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="crypto-dot absolute left-0 animate-pulse" style={{ animationDelay: '1.5s' }}></div>
         </div>
       </div>
     );
@@ -75,6 +76,7 @@ function App() {
     <Router>
       <AuthProvider>
         <BlockchainProvider>
+          <GoogleTranslate />
           <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-sky-light">
             <div className="crypto-grid absolute inset-0 opacity-5 pointer-events-none"></div>
             <Navbar />
@@ -156,8 +158,8 @@ function App() {
                 </div>
               </div>
             </footer>
-            <Toaster 
-              position="top-right" 
+            <Toaster
+              position="top-right"
               toastOptions={{
                 style: {
                   borderRadius: 'var(--radius-md)',
