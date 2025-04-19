@@ -1,0 +1,27 @@
+# Ignore Android-related files
+android/
+
+# Ignore Blockchain & Hyperledger setup
+blockchain/
+chaincode/
+fabric-samples/
+wallet/
+connection-org1.json
+connection-org1.json.bak
+HYPERLEDGER_PRODUCTION_SETUP.md
+README-BLOCKCHAIN.md
+
+# Ignore build output
+dist/
+
+# Node.js dependencies
+node_modules/
+
+# Local environment and config
+.env.local
+capacitor.config.json
+config/
+services/
+
+# General README
+README.md
