@@ -1,0 +1,711 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Innovative Design System for Farm-to-Table Application
+   A forward-thinking design language that combines digital agriculture aesthetics
+   with blockchain technology visual metaphors */
+
+:root {
+  /* Core Palette - Inspired by soil to crop gradients with blockchain tech accents */
+  --soil-dark: #1c2033;
+  --soil-medium: #2a2f45;
+  --soil-light: #343a56;
+  
+  --leaf-primary: #2fd18c;
+  --leaf-light: #4aeaa8;
+  --leaf-dark: #25a66e;
+  
+  --harvest-yellow: #f0c755;
+  --harvest-orange: #ff9138;
+  --harvest-red: #ff5e5b;
+  
+  --sky-light: #e4f5ff;
+  --sky-medium: #a7ddf8;
+  --sky-bright: #56c4fc;
+  
+  /* Blockchain-inspired accent colors */
+  --blockchain-blue: #3d73ff;
+  --blockchain-purple: #9665ff;
+  --blockchain-cyan: #3dcaff;
+  
+  /* Neutral palette */
+  --neutral-900: #121420;
+  --neutral-800: #232638;
+  --neutral-700: #363b54;
+  --neutral-600: #4d5370;
+  --neutral-500: #656c8c;
+  --neutral-400: #8e94ad;
+  --neutral-300: #b7bcce;
+  --neutral-200: #dde0ea;
+  --neutral-100: #f1f2f6;
+  --neutral-50: #f9fafc;
+  
+  /* Status colors */
+  --status-success: var(--leaf-primary);
+  --status-warning: var(--harvest-yellow);
+  --status-error: var(--harvest-red);
+  --status-info: var(--blockchain-blue);
+  --status-pending: var(--blockchain-purple);
+  
+  /* Typography */
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'Inter', sans-serif;
+  
+  /* Base sizes */
+  --space-unit: 4px;
+  --space-xs: calc(var(--space-unit) * 1);    /* 4px */
+  --space-sm: calc(var(--space-unit) * 2);    /* 8px */
+  --space-md: calc(var(--space-unit) * 4);    /* 16px */
+  --space-lg: calc(var(--space-unit) * 6);    /* 24px */
+  --space-xl: calc(var(--space-unit) * 10);   /* 40px */
+  --space-2xl: calc(var(--space-unit) * 16);  /* 64px */
+  
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* Shadows */
+  --shadow-sm: 0px 1px 2px rgba(18, 20, 32, 0.08);
+  --shadow-md: 0px 4px 8px rgba(18, 20, 32, 0.12);
+  --shadow-lg: 0px 8px 16px rgba(18, 20, 32, 0.16);
+  --shadow-xl: 0px 12px 24px rgba(18, 20, 32, 0.2);
+  
+  /* Glow effects for blockchain elements */
+  --glow-leaf: 0 0 15px rgba(47, 209, 140, 0.35);
+  --glow-blockchain: 0 0 20px rgba(150, 101, 255, 0.4);
+  --glow-harvest: 0 0 15px rgba(240, 199, 85, 0.35);
+}
+
+/* Core Utility Classes */
+
+.container-app {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+/* Typography */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--neutral-900);
+}
+
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--neutral-700);
+  background-color: var(--neutral-50);
+}
+
+.display-1 {
+  font-size: 4rem;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.display-2 {
+  font-size: 3.5rem;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.heading-1 {
+  font-size: 2.5rem;
+  line-height: 1.2;
+}
+
+.heading-2 {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.heading-3 {
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
+.heading-4 {
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.body-large {
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+.body {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.body-small {
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.caption {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+
+.mono-text {
+  font-family: var(--font-mono);
+  font-feature-settings: "liga" 0, "calt" 0;
+  letter-spacing: -0.025em;
+}
+
+.text-leaf {
+  color: var(--leaf-primary);
+}
+
+.text-harvest {
+  color: var(--harvest-yellow);
+}
+
+.text-blockchain {
+  color: var(--blockchain-purple);
+}
+
+/* Buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-decoration: none;
+  gap: var(--space-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn:hover::after {
+  opacity: 0.1;
+  background-color: white;
+}
+
+.btn:active::after {
+  opacity: 0.2;
+}
+
+.btn-sm {
+  padding: calc(var(--space-xs) + 2px) var(--space-md);
+  font-size: 0.75rem;
+  border-radius: var(--radius-sm);
+}
+
+.btn-lg {
+  padding: var(--space-md) var(--space-lg);
+  font-size: 1rem;
+  border-radius: var(--radius-lg);
+}
+
+.btn-primary {
+  background-color: var(--leaf-primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background-color: var(--leaf-dark);
+  box-shadow: var(--shadow-md), var(--glow-leaf);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: var(--neutral-100);
+  color: var(--neutral-800);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+  background-color: var(--neutral-200);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-blockchain {
+  background-color: var(--blockchain-purple);
+  color: white;
+  box-shadow: var(--shadow-sm);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-blockchain:hover {
+  background-color: var(--blockchain-purple);
+  box-shadow: var(--shadow-md), var(--glow-blockchain);
+  transform: translateY(-1px);
+}
+
+.btn-harvest {
+  background-color: var(--harvest-yellow);
+  color: var(--neutral-900);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-harvest:hover {
+  background-color: var(--harvest-orange);
+  box-shadow: var(--shadow-md), var(--glow-harvest);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--neutral-300);
+  color: var(--neutral-700);
+}
+
+.btn-outline:hover {
+  border-color: var(--neutral-500);
+  background-color: var(--neutral-100);
+  color: var(--neutral-800);
+}
+
+.btn-outline-leaf {
+  background-color: transparent;
+  border: 1px solid var(--leaf-primary);
+  color: var(--leaf-primary);
+}
+
+.btn-outline-leaf:hover {
+  background-color: var(--leaf-primary);
+  color: white;
+  box-shadow: var(--glow-leaf);
+}
+
+/* Modern Glass Card Design */
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  border: 1px solid rgba(219, 222, 231, 0.7);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+.card-blockchain {
+  background: linear-gradient(120deg, rgba(40, 30, 75, 0.92), rgba(45, 35, 90, 0.95));
+  color: white;
+  border: 1px solid rgba(150, 101, 255, 0.2);
+  backdrop-filter: blur(10px);
+  position: relative;
+}
+
+.card-blockchain::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(150, 101, 255, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.card-blockchain:hover::before {
+  opacity: 1;
+}
+
+.card-blockchain:hover {
+  box-shadow: var(--shadow-xl), var(--glow-blockchain);
+}
+
+.card-soil {
+  background: linear-gradient(120deg, var(--soil-dark), var(--soil-medium));
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-soil:hover {
+  box-shadow: var(--shadow-xl);
+}
+
+.card-leaf {
+  background: linear-gradient(120deg, rgba(47, 209, 140, 0.1), rgba(32, 143, 96, 0.05));
+  border: 1px solid rgba(47, 209, 140, 0.2);
+}
+
+.card-leaf:hover {
+  box-shadow: var(--shadow-xl), var(--glow-leaf);
+}
+
+.card-harvest {
+  background: linear-gradient(120deg, rgba(240, 199, 85, 0.1), rgba(255, 145, 56, 0.05));
+  border: 1px solid rgba(240, 199, 85, 0.2);
+}
+
+.card-harvest:hover {
+  box-shadow: var(--shadow-xl), var(--glow-harvest);
+}
+
+/* Glassmorphism Elements */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.glass-panel-dark {
+  background: rgba(28, 32, 51, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  color: white;
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(219, 222, 231, 0.6);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  transition: all var(--transition-normal);
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 1);
+  border-color: var(--leaf-primary);
+  box-shadow: 0 0 0 3px rgba(47, 209, 140, 0.15);
+}
+
+/* Blockchain Badges and Elements */
+.blockchain-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  padding: 0 var(--space-sm);
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(to right, var(--blockchain-purple), var(--blockchain-blue));
+  color: white;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.blockchain-badge::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 2s infinite;
+  transform: translateX(-100%);
+}
+
+.blockchain-border {
+  border: 1px dashed var(--blockchain-purple);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  position: relative;
+  background: rgba(150, 101, 255, 0.05);
+}
+
+/* Enhanced Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-sm);
+  height: 22px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+.status-created {
+  background-color: rgba(61, 115, 255, 0.15);
+  color: var(--blockchain-blue);
+}
+
+.status-in-transit {
+  background-color: rgba(240, 199, 85, 0.15);
+  color: var(--harvest-orange);
+}
+
+.status-delivered {
+  background-color: rgba(47, 209, 140, 0.15);
+  color: var(--leaf-primary);
+}
+
+.status-verified {
+  background-color: rgba(47, 209, 140, 0.15);
+  color: var(--leaf-primary);
+  font-weight: 600;
+}
+
+.status-verified::after {
+  content: "✓";
+  margin-left: var(--space-xs);
+}
+
+/* Form Styling */
+.form-control {
+  display: block;
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--neutral-700);
+  background-color: white;
+  border: 1px solid var(--neutral-300);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+}
+
+.form-control:focus {
+  border-color: var(--leaf-primary);
+  box-shadow: 0 0 0 3px rgba(47, 209, 140, 0.15);
+  outline: none;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--space-xs);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--neutral-700);
+}
+
+.form-control::placeholder {
+  color: var(--neutral-400);
+}
+
+.form-group {
+  margin-bottom: var(--space-md);
+}
+
+/* Blockchain Decorative Elements */
+.crypto-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(219, 222, 231, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(219, 222, 231, 0.1) 1px, transparent 1px);
+}
+
+.crypto-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--leaf-primary);
+  box-shadow: 0 0 8px var(--leaf-primary);
+}
+
+.crypto-line {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--leaf-primary), transparent);
+  margin: var(--space-md) 0;
+}
+
+/* New Decorative Elements */
+.gradient-border {
+  position: relative;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(to right, var(--leaf-primary), var(--blockchain-purple));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.hex-grid {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 30 L15 7.5 L45 7.5 L60 30 L45 52.5 L15 52.5 Z' stroke='rgba(47, 209, 140, 0.05)' fill='none'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+}
+
+.blockchain-grid {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 10 L50 25 L50 50 L30 65 L10 50 L10 25 Z' stroke='rgba(150, 101, 255, 0.07)' fill='none'/%3E%3C/svg%3E");
+  background-size: 30px 30px;
+}
+
+/* Enhanced Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-rotate {
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+/* Interactive Elements */
+.interactive-card {
+  transition: all var(--transition-normal);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.interactive-card:hover {
+  transform: translateY(-5px) rotateX(2deg) rotateY(2deg);
+  box-shadow: var(--shadow-xl);
+}
+
+.tab-active {
+  position: relative;
+}
+
+.tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--leaf-primary);
+  border-radius: var(--radius-full);
+  transform-origin: center;
+  animation: tab-active 0.3s var(--transition-bounce) forwards;
+}
+
+@keyframes tab-active {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Utility Classes */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-xs { gap: var(--space-xs); }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+.gap-lg { gap: var(--space-lg); }
+
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (min-width: 640px) {
+  .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 768px) {
+  .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+} 
